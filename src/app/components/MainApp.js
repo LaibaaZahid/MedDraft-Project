@@ -5,6 +5,7 @@ import UploadForm from "./UploadForm";
 import ModelSelector from "./ModelSelector";
 import ResultsList from "./ResultsList";
 import MetricChart from "./MetricChart";
+import Navbar from "./Navbar";
 
 export default function MainApp({ goHome }) {
   const [transcript, setTranscript] = useState("");
@@ -13,7 +14,30 @@ export default function MainApp({ goHome }) {
   const [results, setResults] = useState([]);
   const [metrics, setMetrics] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
+   const handleModelsSelected = (selectedModels) => {
+    setModels(selectedModels);
+
+    if (selectedModels.length > 0) {
+      setShowToast(true);
+      setToastMessage(`Models Selected: ${selectedModels.join(", ")}`);
+      setTimeout(() => setShowToast(false), 3000); // hide after 3 seconds
+    }
+  };
+
+  const handleFilesUpload = (transcriptFile, referenceFile) => {
+    setTranscript(transcriptFile);
+    setReference(referenceFile);
+
+    const files = [transcriptFile, referenceFile].filter(Boolean);
+    if (files.length > 0) {
+      setToastMessage(`Files Uploaded`);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    }
+  };
   const handleGenerate = async () => {
   if (!transcript || !reference) {
     setResults([{ soapNote: "Please upload both transcript and reference SOAP note!", model: "Error", metrics: {} }]);
@@ -96,84 +120,75 @@ export default function MainApp({ goHome }) {
 };
   return (
     <div
-      className="min-h-screen bg-cover bg-center relative"
-      style={{ backgroundImage: "url('/landing.jpg')" }}
+      className="min-h-screen bg-cover bg-center relative  bg-[#abe2f1]"
     >
+      <Navbar className="relative z-20"/>
+       {/* Toast */}
+      {showToast && (
+        <div className="fixed top-5 left-1/2 transform -translate-x-1/2 bg-[#246b7f] text-white px-4 py-2 rounded shadow-lg z-50">
+          {toastMessage}
+        </div>
+      )}
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/60"></div>
+      <div className="absolute inset-0 pointer-events-none" ></div>
 
       <div className="relative z-10 p-8">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-white">MedDraft</h1>
-          <button
-            onClick={goHome}
-            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 font-semibold rounded-lg text-white transition"
-          >
-            Home
-          </button>
-        </div>
 
         {/* Forms Row */}
-        <div className="grid md:grid-cols-2 gap-6 mb-6">
+        <div className="grid md:grid-cols-2 gap-6 mb-6 mt-8">
           {/* Upload Form */}
-          <div className="bg-white/10 backdrop-blur-md shadow-lg rounded-xl p-6 text-white">
+          <div className="  bg-[rgba(10,123,155,0.5)]/80 backdrop-blur-md shadow-lg rounded-xl p-6 text-white">
             <h2 className="text-xl font-semibold mb-2">Upload Files</h2>
-            <UploadForm
-              onFilesSelected={(t, r) => {
-                setTranscript(t);
-                setReference(r);
-              }}
-            />
+            <UploadForm onFilesSelected={handleFilesUpload} />
           </div>
 
           {/* Model Selector */}
-          <div className="bg-white/10 backdrop-blur-md shadow-lg rounded-xl p-6 text-white">
+          <div className=" bg-[rgba(10,123,155,0.5)]/80 backdrop-blur-md shadow-lg rounded-xl p-6 text-white">
             <h2 className="text-xl font-semibold mb-2">Select Models</h2>
-            <ModelSelector onModelsSelected={setModels} />
+            <ModelSelector onModelsSelected={handleModelsSelected} />
           </div>
         </div>
 
-        {/* Generate Button */}
-        <div className="mb-6">
-          <button
-            onClick={handleGenerate}
-            disabled={!transcript || !reference || models.length === 0 || loading}
-            className={`w-full py-3 rounded-xl font-semibold transition
-              ${!transcript || !reference || models.length === 0
-                ? "bg-gray-400 cursor-not-allowed text-gray-200"
-                : " bg-blue-500 hover:bg-blue-600 text-white"
-              }`}
-          >
-            {loading ? "Generating..." : "Generate SOAP Note"}
-          </button>
+       {/* Generate and Download Buttons */}
+<div className="mb-12 mt-12 flex justify-center gap-4 max-w-md mx-auto my-5">
+  <button
+    onClick={handleGenerate}
+    disabled={!transcript || !reference || models.length === 0 || loading}
+    className={`flex-1 py-3 rounded-xl font-semibold transition
+      ${!transcript || !reference || models.length === 0
+        ? "bg-gray-400 cursor-not-allowed text-gray-200"
+        : " bg-blue-500 hover:bg-blue-600 text-white"
+      }`}
+  >
+    {loading ? "Generating..." : "Generate SOAP Note"}
+  </button>
 
-           <button
+  <button
     onClick={handleDownloadJSON}
-    className="w-full py-3 mt-4 rounded-xl font-semibold transition bg-blue-500 hover:bg-blue-600 text-white"
     disabled={results.length === 0}
+    className="flex-1 py-3 rounded-xl font-semibold transition bg-blue-500 hover:bg-blue-600 text-white"
   >
     Download JSON
   </button>
-        </div>
+</div>
 
         {/* Results and Metrics */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 mb-5 mt-5">
           {/* Generated SOAP Notes */}
-          <div className="bg-white/10 backdrop-blur-md shadow-lg rounded-xl p-6 max-h-[450px] overflow-auto text-white">
-            <h2 className="text-xl font-semibold mb-4">Generated SOAP Notes</h2>
+          <div className=" bg-[rgba(10,123,155,0.5)]/80 backdrop-blur-md shadow-lg rounded-xl p-6 text-white">
+            <h2 className="text-xl font-semibold mb-4 text-white">Generated SOAP Notes</h2>
             {results.length === 0 ? (
-              <p className="text-gray-300">No SOAP notes generated yet.</p>
+              <p className="flex justify-center items-center text-white h-64">No SOAP notes generated yet.</p>
             ) : (
               <ResultsList results={results} />
             )}
           </div>
 
           {/* Metrics */}
-          <div className="bg-white/10 backdrop-blur-md shadow-lg rounded-xl p-6 max-h-[450px] overflow-auto text-white">
+          <div className="bg-[rgba(10,123,155,0.5)]/80 backdrop-blur-md shadow-lg rounded-xl p-6 text-white">
             <h2 className="text-xl font-semibold mb-4">Metrics</h2>
             {metrics.length === 0 ? (
-              <div className="flex justify-center items-center h-64 text-gray-400">
+              <div className="flex justify-center items-center h-64 text-white">
                 <p>Graph will appear here after generating results.</p>
               </div>
             ) : (

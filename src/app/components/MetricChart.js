@@ -25,33 +25,9 @@ export default function MetricChart({ metrics }) {
     ],
   };
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top",
-        labels: { color: "#ffffff" }, // legend text color
-      },
-      tooltip: {
-        titleColor: "#ffffff",
-        bodyColor: "#ffffff", // tooltip text color
-      },
-    },
-    scales: {
-      x: {
-        ticks: { color: "#ffffff" }, // x-axis labels
-        grid: { color: "rgba(255,255,255,0.2)" }, // x-axis grid
-      },
-      y: {
-        ticks: { color: "#ffffff" }, // y-axis labels
-        grid: { color: "rgba(255,255,255,0.2)" }, // y-axis grid
-      },
-    },
-  };
-
   return (
-    <div className="p-4 bg-gray-600/90 shadow rounded">
-      <Bar data={data} options={options} />
+    <div className="p-4 bg-white/90 shadow rounded">
+      <Bar data={data} />
     </div>
   );
 }

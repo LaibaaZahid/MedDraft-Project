@@ -2,15 +2,15 @@ export default function ResultsList({ results }) {
   if (!results || results.length === 0) return null;
 
   return (
-    <div className="p-4 shadow space-y-4 rounded w-full text-white bg-gray-600/90">
+    <div className="p-4 shadow space-y-4 rounded w-full text-black bg-white/90 my-3 scroll-auto overflow-y-auto max-h-80">
       
 
       {results.map((item, index) => (
         <div key={index} className="space-y-2">
           
           <div className="border p-2 rounded">
-            <p className="font-medium text-white">Model: {item.model}</p>
-            <pre className="whitespace-pre-wrap text-white">{item.soapNote}</pre>
+            <p className="font-medium text-black">Model: {item.model}</p>
+            <pre className="whitespace-pre-wrap text-black">{item.soapNote}</pre>
           </div>
 
           <button
@@ -21,7 +21,7 @@ export default function ResultsList({ results }) {
               link.download = `${item.model}_SOAP_Note.txt`;
               link.click();
             }}
-            className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
+            className="mt-2 bg-[#246b7f] hover:bg-blue-600 text-white px-3 py-1 rounded"
           >
             Download SOAP Note
           </button>

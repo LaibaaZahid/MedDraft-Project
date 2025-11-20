@@ -7,9 +7,17 @@ export default function ModelSelector({ onModelsSelected }) {
 
   const [openai, setOpenai] = useState("");
   const [gemini, setGemini] = useState("");
+  const [warning, setWarning] = useState(""); // warning state
 
   const handleSubmit = () => {
     const selected = [openai, gemini].filter(Boolean);
+
+    if (selected.length === 0) {
+      setWarning("Please select any model."); // show warning
+      return;
+    }
+
+    setWarning(""); // clear warning if model(s) selected
     onModelsSelected(selected);
   };
 
@@ -21,7 +29,7 @@ export default function ModelSelector({ onModelsSelected }) {
         <select
           value={openai}
           onChange={(e) => setOpenai(e.target.value)}
-          className="border border-gray-500 p-2.5 m-0.5 rounded w-full text-white bg-gray-600/90"
+          className="border border-gray-500 p-3.5 rounded w-full text-black bg-white/70"
         >
           <option value="">Select Model</option>
           {OPENAI_MODELS.map((model) => (
@@ -36,7 +44,7 @@ export default function ModelSelector({ onModelsSelected }) {
         <select
           value={gemini}
           onChange={(e) => setGemini(e.target.value)}
-          className="border border-gray-500 p-2.5 rounded w-full text-white bg-gray-600/90"
+          className="border border-gray-500 p-3.5 rounded w-full text-black bg-white/70"
         >
           <option value="">Select Model</option>
           {GEMINI_MODELS.map((model) => (
@@ -45,9 +53,12 @@ export default function ModelSelector({ onModelsSelected }) {
         </select>
       </div>
 
+      {/* Warning message */}
+      {warning && <p className="text-red-500 font-medium">{warning}</p>}
+
       <button
         onClick={handleSubmit}
-        className=" bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition w-full"
+        className="bg-[#246b7f] hover:bg-blue-600 text-white px-4 py-2 rounded transition w-full"
       >
         Select Models
       </button>
