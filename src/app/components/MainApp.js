@@ -7,7 +7,7 @@ import ResultsList from "./ResultsList";
 import MetricChart from "./MetricChart";
 import Navbar from "./Navbar";
 
-export default function MainApp({ goHome }) {
+export default function MainApp() {
   const [transcript, setTranscript] = useState("");
   const [reference, setReference] = useState("");
   const [models, setModels] = useState([]);
@@ -17,6 +17,7 @@ export default function MainApp({ goHome }) {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
+   const [calculatedMetrics, setCalculatedMetrics] = useState([]); // store metrics temporarily
    const handleModelsSelected = (selectedModels) => {
     setModels(selectedModels);
 
@@ -38,70 +39,70 @@ export default function MainApp({ goHome }) {
       setTimeout(() => setShowToast(false), 3000);
     }
   };
+  
   const handleGenerate = async () => {
-  if (!transcript || !reference) {
-    setResults([{ soapNote: "Please upload both transcript and reference SOAP note!", model: "Error", metrics: {} }]);
-    return;
-  }
-  if (!models.length) {
-    setResults([{ soapNote: "Please select a model!", model: "Error", metrics: {} }]);
-    return;
-  }
-
-  setLoading(true);
-  setResults([]); // clear previous results
-
-  try {
-    const res = await fetch("/api/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ transcript, reference, models }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok || data.error) {
-      // Show the error directly in SOAP Notes card
-      setResults([
-        {
-          soapNote: data.error || "Temporary failure. Please try again.",
-          model: "Error",
-          metrics: {},
-        },
-      ]);
-      setLoading(false);
+    if (!transcript || !reference) {
+      setResults([{ soapNote: "Please upload both transcript and reference SOAP note!", model: "Error", metrics: {} }]);
+      return;
+    }
+    if (!models.length) {
+      setResults([{ soapNote: "Please select a model!", model: "Error", metrics: {} }]);
       return;
     }
 
-    // If results exist
-    if (data.results && data.results.length > 0) {
-      const newResults = data.results.map((result) => ({
-        transcript,
-        reference,
-        soapNote: result.soapNote || (result.error ? result.error : "No content generated"),
-        model: result.model,
-        metrics: result.metrics,
-      }));
-      setResults(newResults);
+    setLoading(true);
+    setResults([]);
+    setMetrics([]); // clear previous metrics
 
-      const newMetrics = data.results.map((result) => ({
-        model: result.model,
-        bleu: result.metrics?.bleu ?? 0,
-      }));
-      setMetrics(newMetrics);
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transcript, reference, models }),
+      });
 
-    } else {
-      // If results array is empty but no error, show generic message
-      setResults([{ soapNote: "No SOAP notes generated.", model: "Info", metrics: {} }]);
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        setResults([{ soapNote: data.error || "Temporary failure. Please try again.", model: "Error", metrics: {} }]);
+        setLoading(false);
+        return;
+      }
+
+      if (data.results && data.results.length > 0) {
+        const newResults = data.results.map((result) => ({
+          transcript,
+          reference,
+          soapNote: result.soapNote || (result.error ? result.error : "No content generated"),
+          model: result.model,
+          metrics: result.metrics, // keep metrics here but do not show yet
+        }));
+        setResults(newResults);
+
+        // store metrics temporarily
+        const newMetrics = data.results.map((result) => ({
+          model: result.model,
+          bleu: result.metrics?.bleu ?? 0,
+        }));
+        setCalculatedMetrics(newMetrics);
+
+      } else {
+        setResults([{ soapNote: "No SOAP notes generated.", model: "Info", metrics: {} }]);
+      }
+
+    } catch (err) {
+      console.error(err);
+      setResults([{ soapNote: "Network or unexpected error occurred. Please try again.", model: "Error", metrics: {} }]);
+    } finally {
+      setLoading(false);
     }
+  };
 
-  } catch (err) {
-    console.error(err);
-    setResults([{ soapNote: "Network or unexpected error occurred. Please try again.", model: "Error", metrics: {} }]);
-  } finally {
-    setLoading(false);
-  }
-};
+ const handleEvaluate = () => {
+    if (calculatedMetrics.length) {
+      setMetrics(calculatedMetrics);
+    }
+  };
 
 
   const handleDownloadJSON = () => {
@@ -189,13 +190,24 @@ export default function MainApp({ goHome }) {
             <h2 className="text-xl font-semibold mb-4">Metrics</h2>
             {metrics.length === 0 ? (
               <div className="flex justify-center items-center h-64 text-white">
-                <p>Graph will appear here after generating results.</p>
+                <p>Graph will appear here after evaluating results.</p>
               </div>
             ) : (
               <MetricChart metrics={metrics} />
             )}
           </div>
         </div>
+        {results.length > 0 && (
+  <div className="flex justify-center my-8">
+    <button
+      onClick={handleEvaluate}
+      className="w-60  py-3 rounded-xl font-semibold bg-blue-500 hover:bg-blue-600 text-white transition"
+    >
+      Evaluate
+    </button>
+  </div>
+)}
+
       </div>
     </div>
   );
