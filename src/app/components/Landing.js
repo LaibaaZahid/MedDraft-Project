@@ -17,7 +17,6 @@ export default function Landing() {
       {/* Navbar */}
       <Navbar />
 
-      {/* Center Content */}
         <div className="flex flex-col justify-center items-center grow mt-12 mb-20 px-4 sm:px-6 lg:px-0">
   <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-blue-600 text-center mb-6 drop-shadow-lg mt-15">
     Simplify Your Medical Documentation
@@ -37,7 +36,7 @@ export default function Landing() {
         </button>
       </div>
 
-      {/* How It Works - at the bottom */}
+
       <HowItWorks />
     </div>
     

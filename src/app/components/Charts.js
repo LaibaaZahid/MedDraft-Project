@@ -28,6 +28,7 @@ ChartJS.register(
 );
 
 export default function Charts() {
+  /* The Detailed Charts page */
   const [metrics, setMetrics] = useState([]);
   const [selectedMetric, setSelectedMetric] = useState("bleu");
 const router = useRouter();
@@ -69,10 +70,9 @@ const router = useRouter();
         text: `${selectedMetric.toUpperCase()} Comparison Across Models`,
         font: { size: 18 },
       },
-      // Remove datalabels plugin entirely for clean bars
     },
     scales: {
-      y: { beginAtZero: true }, // keep axis values
+      y: { beginAtZero: true }, 
     },
   };
 

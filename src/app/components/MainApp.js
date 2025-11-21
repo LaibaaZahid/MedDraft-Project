@@ -9,6 +9,9 @@ import Navbar from "./Navbar";
 import { useRouter } from "next/navigation";
 
 export default function MainApp() {
+  
+  /* The Main page where soap notes are generated and results are shown */
+
   const [transcript, setTranscript] = useState("");
   const [reference, setReference] = useState("");
   const [models, setModels] = useState([]);
@@ -77,11 +80,11 @@ const [evaluated, setEvaluated] = useState(false);
           reference,
           soapNote: result.soapNote || (result.error ? result.error : "No content generated"),
           model: result.model,
-          metrics: result.metrics, // keep metrics here but do not show yet
+          metrics: result.metrics, 
         }));
         setResults(newResults);
     localStorage.setItem("results", JSON.stringify(newResults));
-        // store metrics temporarily
+
         const newMetrics = data.results.map((result) => ({
           model: result.model,
           bleu: result.metrics?.bleu ?? 0,

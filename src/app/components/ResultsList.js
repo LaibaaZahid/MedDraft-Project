@@ -4,7 +4,7 @@ export default function ResultsList({ results }) {
   return (
     <div className="p-4 shadow space-y-4 rounded w-full text-black bg-white/90 my-3 scroll-auto overflow-y-auto max-h-80">
       
-
+      {/* Soap Notes */}
       {results.map((item, index) => (
         <div key={index} className="space-y-2">
           

@@ -12,6 +12,7 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export default function MetricChart({ metrics }) {
+  /* Bleu chart on the main app page */
   if (!metrics || metrics.length === 0) return null;
 
   const data = {

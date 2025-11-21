@@ -7,17 +7,17 @@ export default function ModelSelector({ onModelsSelected }) {
 
   const [openai, setOpenai] = useState("");
   const [gemini, setGemini] = useState("");
-  const [warning, setWarning] = useState(""); // warning state
+  const [warning, setWarning] = useState(""); 
 
   const handleSubmit = () => {
     const selected = [openai, gemini].filter(Boolean);
 
     if (selected.length === 0) {
-      setWarning("Please select any model."); // show warning
+      setWarning("Please select any model."); 
       return;
     }
 
-    setWarning(""); // clear warning if model(s) selected
+    setWarning(""); 
     onModelsSelected(selected);
   };
 

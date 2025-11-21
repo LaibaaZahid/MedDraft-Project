@@ -1,7 +1,6 @@
 export const runtime = "nodejs";
 
 import OpenAI from "openai";
-import natural from "natural";
 
 const openAIClient = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
