@@ -191,7 +191,7 @@ const handleClear = () => {
         : " bg-blue-500 hover:bg-blue-600 text-white"
       }`}
   >
-    {loading ? "Generating..." : "Generate SOAP Note"}
+    {loading ? "Generating..." : "Generate SOAP Notes"}
   </button>
 
   <button
