@@ -95,6 +95,34 @@ function simpleBLEU(reference, candidate) {
   const matches = candTokens.filter((t) => refTokens.includes(t));
   return matches.length / candTokens.length;
 }
+// Token-level Accuracy
+function simpleAccuracy(reference, candidate) {
+  const refTokens = (reference || "").trim().split(/\s+/).filter(Boolean);
+  const candTokens = (candidate || "").trim().split(/\s+/).filter(Boolean);
+  if (!refTokens.length) return 0;
+  const minLen = Math.min(refTokens.length, candTokens.length);
+  let correct = 0;
+  for (let i = 0; i < minLen; i++) {
+    if (refTokens[i] === candTokens[i]) correct++;
+  }
+  return correct / refTokens.length;
+}
+
+// Cosine Similarity using token frequency vectors
+function cosineSimilarity(reference, candidate) {
+  const refTokens = (reference || "").trim().split(/\s+/).filter(Boolean);
+  const candTokens = (candidate || "").trim().split(/\s+/).filter(Boolean);
+  const allTokens = Array.from(new Set([...refTokens, ...candTokens]));
+
+  const vecA = allTokens.map(t => refTokens.filter(x => x === t).length);
+  const vecB = allTokens.map(t => candTokens.filter(x => x === t).length);
+
+  const dot = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
+  const magA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
+  const magB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
+
+  return magA && magB ? dot / (magA * magB) : 0;
+}
 
 export async function POST(req) {
   try {
@@ -122,11 +150,17 @@ export async function POST(req) {
       }
 
       const bleu = reference ? simpleBLEU(reference, soapNote) : 0;
+      const accuracy = reference ? simpleAccuracy(reference, soapNote) : 0;
+      const cosine = reference ? cosineSimilarity(reference, soapNote) : 0;
 
       results.push({
         model,
         soapNote: soapNote || "",
-        metrics: { bleu: Number(bleu) || 0 },
+        metrics: { 
+          bleu: Number(bleu.toFixed(3)),
+          accuracy: Number(accuracy.toFixed(3)),
+          cosine: Number(cosine.toFixed(3))
+        },
         error,
       });
 

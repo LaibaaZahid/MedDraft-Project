@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import UploadForm from "./UploadForm";
 import ModelSelector from "./ModelSelector";
 import ResultsList from "./ResultsList";
 import MetricChart from "./MetricChart";
 import Navbar from "./Navbar";
+import { useRouter } from "next/navigation";
 
 export default function MainApp() {
   const [transcript, setTranscript] = useState("");
@@ -16,8 +17,9 @@ export default function MainApp() {
   const [loading, setLoading] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
-
+const [evaluated, setEvaluated] = useState(false);
    const [calculatedMetrics, setCalculatedMetrics] = useState([]); // store metrics temporarily
+   const router = useRouter();
    const handleModelsSelected = (selectedModels) => {
     setModels(selectedModels);
 
@@ -78,11 +80,13 @@ export default function MainApp() {
           metrics: result.metrics, // keep metrics here but do not show yet
         }));
         setResults(newResults);
-
+    localStorage.setItem("results", JSON.stringify(newResults));
         // store metrics temporarily
         const newMetrics = data.results.map((result) => ({
           model: result.model,
           bleu: result.metrics?.bleu ?? 0,
+          accuracy: result.metrics?.accuracy ?? 0,
+          cosine: result.metrics?.cosine ?? 0,
         }));
         setCalculatedMetrics(newMetrics);
 
@@ -101,6 +105,8 @@ export default function MainApp() {
  const handleEvaluate = () => {
     if (calculatedMetrics.length) {
       setMetrics(calculatedMetrics);
+      setEvaluated(true);
+      localStorage.setItem("metrics", JSON.stringify(calculatedMetrics)); 
     }
   };
 
@@ -119,6 +125,30 @@ export default function MainApp() {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 };
+
+useEffect(() => {
+  const savedResults = JSON.parse(localStorage.getItem("results"));
+  const savedMetrics = JSON.parse(localStorage.getItem("metrics"));
+  if (savedResults) setResults(savedResults);
+  if (savedMetrics){
+     setMetrics(savedMetrics);
+     setEvaluated(true);
+  }
+}, []);
+const handleClear = () => {
+  setResults([]);
+  setMetrics([]);
+  setCalculatedMetrics([]);
+  setTranscript("");
+  setReference("");
+  setModels([]);
+  localStorage.removeItem("results");
+  localStorage.removeItem("metrics");
+  setShowToast(true);
+  setToastMessage("All data cleared");
+  setTimeout(() => setShowToast(false), 3000);
+};
+
   return (
     <div
       className="min-h-screen bg-cover bg-center relative  bg-[#effcff]"
@@ -155,7 +185,7 @@ export default function MainApp() {
   <button
     onClick={handleGenerate}
     disabled={!transcript || !reference || models.length === 0 || loading}
-    className={`flex-1 py-3 rounded-xl font-semibold transition
+    className={`flex-1 py-4 rounded-xl font-semibold transition
       ${!transcript || !reference || models.length === 0
         ? "bg-gray-400 cursor-not-allowed text-gray-200"
         : " bg-blue-500 hover:bg-blue-600 text-white"
@@ -167,7 +197,7 @@ export default function MainApp() {
   <button
     onClick={handleDownloadJSON}
     disabled={results.length === 0}
-    className={`flex-1 py-3 rounded-xl font-semibold transition
+    className={`flex-1 py-4 rounded-xl font-semibold transition
       ${results.length === 0
         ? "bg-gray-400 cursor-not-allowed text-gray-200"
         : " bg-blue-500 hover:bg-blue-600 text-white"
@@ -202,13 +232,30 @@ export default function MainApp() {
           </div>
         </div>
         {results.length > 0 && (
-  <div className="flex justify-center my-8">
+  <div className="mb-12 mt-12 flex justify-center gap-4 max-w-md mx-auto my-5">
     <button
       onClick={handleEvaluate}
-      className="w-60  py-3 rounded-xl font-semibold bg-blue-500 hover:bg-blue-600 text-white transition"
+      className="w-60 py-1 rounded-xl font-semibold bg-blue-500 hover:bg-blue-600 text-white transition"
     >
       Evaluate
     </button>
+    <button
+  onClick={() => router.push("/Charts")} // lowercase route
+  disabled={!evaluated}
+  className={`w-60 py-1 rounded-xl font-semibold transition
+    ${!evaluated
+      ? "bg-gray-400 cursor-not-allowed text-gray-200"
+      : "bg-blue-500 hover:bg-blue-600 text-white"
+    }`}
+>
+  View Detailed Charts
+</button>
+<button
+    onClick={handleClear}
+    className="w-60 py-1 rounded-xl font-semibold bg-blue-500 hover:bg-blue-600 text-white transition"
+  >
+    Clear All
+  </button>
   </div>
 )}
 
