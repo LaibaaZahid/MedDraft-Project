@@ -59,7 +59,7 @@ export default function MetricChart({ metrics }) {
         max: 1,
         ticks: {
           stepSize: 0.1,
-          color: "#1e40af",
+          color: "#000000",
           font: { size: 12, weight: "bold" },
         },
         grid: {
@@ -68,7 +68,7 @@ export default function MetricChart({ metrics }) {
       },
       x: {
         ticks: {
-          color: "#1e40af",
+          color: "#000000",
           font: { size: 12, weight: "bold" },
         },
         grid: {
