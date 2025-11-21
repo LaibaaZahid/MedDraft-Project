@@ -36,6 +36,7 @@ export default function UploadForm({ onFilesSelected }) {
 
   return (
     <div className="space-y-4">
+      {/* Form to upload transcript and reference txt files */}
       <div>
         <label className="block mb-1 font-medium text-white">Transcript (.txt)</label>
         <input
