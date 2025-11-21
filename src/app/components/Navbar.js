@@ -16,9 +16,7 @@ export default function Navbar() {
           Home
         </Link>
 
-        <Link href="/HowItWorks" className="hover:text-blue-800 transition text-white">
-          How It Works
-        </Link>
+        
       </div>
     </nav>
   );

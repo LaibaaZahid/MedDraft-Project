@@ -121,7 +121,7 @@ export default function MainApp() {
 };
   return (
     <div
-      className="min-h-screen bg-cover bg-center relative  bg-[#abe2f1]"
+      className="min-h-screen bg-cover bg-center relative  bg-[#effcff]"
     >
       <Navbar className="relative z-20"/>
        {/* Toast */}
@@ -167,7 +167,11 @@ export default function MainApp() {
   <button
     onClick={handleDownloadJSON}
     disabled={results.length === 0}
-    className="flex-1 py-3 rounded-xl font-semibold transition bg-blue-500 hover:bg-blue-600 text-white"
+    className={`flex-1 py-3 rounded-xl font-semibold transition
+      ${results.length === 0
+        ? "bg-gray-400 cursor-not-allowed text-gray-200"
+        : " bg-blue-500 hover:bg-blue-600 text-white"
+      }`}
   >
     Download JSON
   </button>
