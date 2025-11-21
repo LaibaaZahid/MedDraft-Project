@@ -11,7 +11,7 @@ export default function Landing() {
   return (
     <>
     <div
-      className="relative min-h-screen bg-cover bg-center flex flex-col items-center "
+      className="relative min-h-screen bg-cover bg-center flex flex-col items-center"
       style={{ backgroundImage: "url('/landing.jpg')" }}
     >
       {/* Navbar */}

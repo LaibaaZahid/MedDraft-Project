@@ -54,8 +54,7 @@ export default function HowItWorks() {
   return (
     <section className="w-full py-20 flex justify-center">
       {/* Main card container */}
-      <div className="max-w-6xl w-full bg-[#ccf1f9] rounded-3xl p-10 
-                  border-4 border-[#ccf1f9] shadow-[30px_30px_30px_rgba(0,0,0,0.3)]">
+      <div className="max-w-6xl w-full bg-[#d8edff] rounded-3xl p-10 border-4 border-[#ccf1f9] shadow-[30px_30px_30px_rgba(0,0,0,0.3)]">
         <h2 className="text-4xl font-extrabold text-center text-blue-700 mb-8">How It Works</h2>
         <p className="text-center text-blue-600 mb-10 max-w-3xl mx-auto">
           A simple 4-step flow to convert conversations into structured SOAP notes using multiple AI models — upload, choose, generate and evaluate.
